@@ -345,3 +345,99 @@ displayAdult age = if age >= 20 then "成人" else "未成年"
 displayAdult 18
 --> "未成年" : String
 ```
+
+#### リスト
+リストは関連する値の連続を保持するデータ構造
+
+リスト内の値は全て同じ型である必要がある
+
+```elm
+-- 変数namesにリストを代入
+names = ["Bob", "Alice", "Chuck"]
+--> ["Bob","Alice","Chuck"] : List String
+
+-- isEmptyメソッドでリストが空かどうか判定
+List.isEmpty names
+--> False : Bool
+
+-- リストの長さを取得
+List.length names
+--> 3 : Int
+
+-- リストの並び順を逆にする
+List.reverse names
+--> ["Chuck","Alice","Bob"] : List String
+
+-- リストをソートする
+List.sort names
+--> ["Alice","Bob","Chuck"] : List String
+
+-- リスト内の要素に対して関数を適用する
+-- function: String: <name> -> String: "I'm <name>"
+List.map (\e -> "I'm " ++ e) names
+--> ["I'm Bob","I'm Alice","I'm Chuck"] : List String
+```
+
+#### タプル
+タプルは固定された個数の値を保持するデータ構造
+
+リストと異なり、保持する値の型はそれぞれ別々にすることが可能
+
+2つ以上の値を返す関数を作りたいときなどに使う
+
+```elm
+-- goodName関数: 20文字以内の名前か判定する
+-- タプルを使い (20文字以内かどうか, メッセージ) を返す
+goodName name =
+  if String.length name <= 20 then
+    (True, "Name accepted!")
+  else
+    (False, "Name was too long; Please limit it to 20 characters")
+--> <function> : String -> ( Bool, String )
+
+-- 関数実行
+goodName "John"
+--> (True, "Name accepted!") : ( Bool, String )
+```
+
+#### レコード
+レコードは辞書配列やオブジェクトと似たようなデータ構造で、任意このフィールドに値を設定することができる
+
+ただし、Elmのレコードのフィールドは固定されていて、動的にフィールドを加えたり取り除いたりはできない
+
+また、フィールドの値を変更することもできない（immutable）
+
+```elm
+-- name, ageフィールドを持つレコードをbillに代入
+point = {x = 3, y = 4}
+--> { x = 3, y = 4 } : { x : number, y : number1 }
+
+-- xフィールドを取得
+point.x
+--> 3 : number
+
+-- `.フィールド名`で関数のようにフィールド値を取得できる
+.y point
+--> 4 : number
+
+List.map .x [point, point, point]
+--> [3,3,3] : List number
+
+-- レコードを引数とする関数を定義
+-- ageフィールドが70未満か判定
+under70 {age} = age < 70
+--> <function> : { a | age : number } -> Bool
+
+yoya = {name = "amenoyoya", age = 120}
+--> { age = 120, name = "amenoyoya" } : { age : number, name : String }
+
+under70 yoya
+--> False : Bool
+
+-- レコードの値を更新して新しいレコードを作る
+{ yoya | name = "hoge" }
+--> { age = 120, name = "hoge" } : { age : number, name : String }
+
+under70 { yoya | age = 31 }
+--> True : Bool
+```
