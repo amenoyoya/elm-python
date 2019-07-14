@@ -441,3 +441,9 @@ under70 yoya
 under70 { yoya | age = 31 }
 --> True : Bool
 ```
+
+***
+
+## The Elm Architecture
+
+See [Architecture.md](./Architecture.md)
