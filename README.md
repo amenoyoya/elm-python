@@ -444,6 +444,12 @@ under70 { yoya | age = 31 }
 
 ***
 
+## 型について
+
+See [型.md](./型.md)
+
+***
+
 ## The Elm Architecture
 
 See [Architecture.md](./Architecture.md)
