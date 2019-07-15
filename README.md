@@ -450,6 +450,12 @@ See [型.md](./型.md)
 
 ***
 
+## エラーハンドリング
+
+See [エラーハンドリング.md](./エラーハンドリング.md)
+
+***
+
 ## The Elm Architecture
 
 See [Architecture.md](./Architecture.md)
