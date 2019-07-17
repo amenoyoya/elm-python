@@ -459,3 +459,9 @@ See [エラーハンドリング.md](./エラーハンドリング.md)
 ## The Elm Architecture
 
 See [Architecture.md](./Architecture.md)
+
+***
+
+## Pythonで静的型付け関数型プログラミング
+
+See [FunctionalPython.md](./FunctionalPython.md)
