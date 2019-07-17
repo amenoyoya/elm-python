@@ -83,3 +83,30 @@ print(add("Hello ", "World"))
         ## -> 型が間違っているため以下のようなエラー文が表示される
         py/type-hints_02.py:4: error: Incompatible types in assignment (expression has type "str", variable has type "int")
         ```
+
+#### Pyrightによる型解析
+「mypyより5倍高速」という謳い文句で、2019年にMicrosoftが**Pyright**という静的型解析ツールを公開している
+
+- Install Pyright:
+    ```bash
+    $ yarn add -D pyright
+    ```
+- Test run:
+    ```bash
+    $ yarn pyright py/type-hints_01.py
+    ## -> 型が正しく処理されているため何も表示されない
+    Searching for source files
+    Found 1 source file
+    0 errors, 0 warnings
+
+    $ yarn pyright py/type-hints_02.py
+    ## -> 型が間違っているため以下のようなエラー文が表示される
+    Searching for source files
+    Found 1 source file
+    ./py/type-hints_02.py
+        4:15 - error: Expression of type 'str' cannot be assigned to declared type 'int'
+        'Type[str]' is incompatible with 'Type[int]'
+    1 error, 0 warnings
+    ```
+
+なお、PyrightはVSCodeプラグインとしても公開されているため、エディタとしてVSCodeを使っている場合はインストールしておくと良い
