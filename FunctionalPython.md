@@ -87,6 +87,8 @@ print(add("Hello ", "World"))
 #### Pyrightによる型解析
 「mypyより5倍高速」という謳い文句で、2019年にMicrosoftが**Pyright**という静的型解析ツールを公開している
 
+**※ 2019年7月現在、PyrightはNewTypeの型強制をスルーしてしまう**
+
 - Install Pyright:
     ```bash
     $ yarn add -D pyright
@@ -136,4 +138,28 @@ human: Human = ('amenoyoya', 120)
 
 print(human)
 ## -> ('amenoyoya', 120)
+```
+
+---
+
+### NewType
+Elmにおける alias と同等の機能を提供するのは `NewType`ヘルパー関数
+
+```python
+from typing import Tuple, NewType
+
+# RGB色型
+Color = NewType('Color', Tuple[int, int, int])
+
+# (255,0,0) -> 'ff0000' 変換関数: Color -> str
+def toRGB(color: Color) -> str:
+    return '%x' % color[0] + '%x' % color[1] + '%x' % color[2]
+
+print(toRGB(Color((100, 200, 255))))
+## -> 64c8ff
+
+# NewTypeで定義された型は Type aliases と異なり、型を強制される
+## -> 以下は mypy で型チェックするとエラーになる
+### ※ Pyright ではスルーされた。。。
+print(toRGB((100, 200, 255)))
 ```
