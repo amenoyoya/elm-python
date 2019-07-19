@@ -87,8 +87,6 @@ print(add("Hello ", "World"))
 #### Pyrightによる型解析
 「mypyより5倍高速」という謳い文句で、2019年にMicrosoftが**Pyright**という静的型解析ツールを公開している
 
-**※ 2019年7月現在、PyrightはNewTypeの型強制をスルーしてしまう**
-
 - Install Pyright:
     ```bash
     $ yarn add -D pyright
@@ -112,6 +110,14 @@ print(add("Hello ", "World"))
     ```
 
 なお、PyrightはVSCodeプラグインとしても公開されているため、エディタとしてVSCodeを使っている場合はインストールしておくと良い
+
+#### mypy と Pyright の比較
+- 速度: Pyright > mypy
+- 厳格さ:
+    - NewTypeによる型強制: mypy > Pyright（対応していない）
+    - ジェネリクス型の演算: mypy（緩い） < Pyright（厳格）
+
+厳格さに関しては mypy, Pyright ともに一長一短だが、速度の勝るPyrightの方が良さげ
 
 ---
 
@@ -187,4 +193,79 @@ map: Callable[[List[int], Callable[[int], int]], List[int]] \
 
 print(map([1, 2, 3], lambda e: e * 2))
 ## -> [2, 4, 6]
+```
+
+---
+
+### ジェネリクス
+コンテナ型（List型やTuple型など）がそれ単体では型とはならず、コンテナの要素の型が示されて初めて型推論される
+
+このように複数の型になりうる汎用的な型をジェネリクスと呼ぶ
+
+ジェネリクスは`TypeVar`ファクトリによってパラメータ化することができる
+
+```python
+from typing import Sequence, TypeVar
+
+T = TypeVar('T') # ジェネリクス型'T'
+
+# 何らかの型の連続体の最初の値を取り出す関数: Sequence<T> -> T
+def first(l: Sequence[T]) -> T:
+    return l[0]
+
+# first関数は、List<int> でも Tuple<str> でも、型の連続体であれば、どのような型でも処理できる
+print(first([99, 88, 77])) # -> 99
+print(first(('Hello', 'World'))) # -> Hello
+```
+
+さらに `Generic`を基底クラスにすることで、ジェネリッククラスを定義することもできる
+
+```python
+from typing import Tuple, NewType, TypeVar, Generic
+
+T = TypeVar('T')
+
+# Pairクラス: 何らかの型がペアになったもの
+class Pair(Generic[T]):
+    def __init__(self, v1: T, v2: T) -> None:
+        self.values: Tuple[T, T] = (v1, v2)
+    
+    def get1(self) -> T:
+        return self.values[0]
+    
+    def get2(self) -> T:
+        return self.values[1]
+
+# str型のPairクラスをName型と定義
+Name = NewType('Name', Pair[str])
+
+# Name型変数 harry 作成
+harry: Name = Name(Pair('Harry', 'Potter'))
+print(harry.get1()) # -> Harry
+```
+
+#### 制約付きジェネリクス
+特定の型だけをとりうるジェネリクスを作ることもできる
+
+例えば、数値型（`int` or `float`）の値を引数にとって割り算をするような関数を作る場合などは、制約付きジェネリクスを使う
+
+```python
+from typing import TypeVar
+
+# Number型 = int型 | float型
+Number = TypeVar('Number', int, float)
+
+# 割り算を行う関数: (Number, Number) -> float
+def div(x: Number, y: Number) -> float:
+    # 以下のように記述すると、mypyでは通るがPyrightでは通らない
+    # return float(x / y)
+
+    # Pyrightでも通るようにするには、その演算子を確実に使える型にキャストする
+    return float(float(x) / float(y))
+
+# 3 / 2 => 1.5
+print(div(3.0, 2))
+
+# str型などを渡すと型エラーになる
+print(div(3.0, '2'))
 ```
