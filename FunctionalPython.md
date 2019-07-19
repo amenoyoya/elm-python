@@ -269,3 +269,32 @@ print(div(3.0, 2))
 # str型などを渡すと型エラーになる
 print(div(3.0, '2'))
 ```
+
+---
+
+### Any型
+動的型付けと静的型付けが混在したコードを書く必要があるとき、非常口として、あらゆる型を許容する`Any`型を使うことができる
+
+ただし、Any型を使ってしまうと型推論のメリットがなくなってしまうため、あくまで非常口として使うこと
+
+```python
+from typing import Any, TypeVar
+
+# どんな型でも引数にとれる関数
+def print_any(arg: Any) -> None:
+    print(arg)
+
+
+# 上記と同等の関数を、ジェネリクス型を使って書くこともできる
+T = TypeVar('T')
+
+def print_generics(arg: T) -> None:
+    print(arg)
+
+
+print_any(['print', 'any'])
+## -> ['print', 'any']
+
+print_generics(['print', 'generics'])
+## -> ['print', 'generics']
+```
