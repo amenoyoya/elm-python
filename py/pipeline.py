@@ -29,3 +29,18 @@ class pipe(object):
 # (1 + 2) => print(x)
 pipe(1 + 2) | print
 ## -> 3
+
+# 引数にとった数値から3を引く関数: int -> int
+sub3: Callable[[int], int] = lambda x: x - 3
+
+# 10 - 3
+pipe(10) | sub3 | print
+## -> 7
+
+# 引数にとった数値からnを引く関数: int -> int -> int
+def sub(n: int) -> Callable[[int], int]:
+    return lambda x: x - n
+
+# 10 - 3
+pipe(10) | sub(3) | print
+## -> 7
