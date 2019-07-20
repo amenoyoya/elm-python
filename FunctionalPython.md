@@ -298,3 +298,87 @@ print_any(['print', 'any'])
 print_generics(['print', 'generics'])
 ## -> ['print', 'generics']
 ```
+
+***
+
+## Pythonで関数型プログラミング
+
+### lambda式による純粋関数定義
+**呼び出し可能オブジェクト**の項で少し触れたように、lambda式とCallable型を使うことで、かなり関数型言語っぽく書ける
+
+```python
+from typing import List, Callable
+
+# List<int> に対して (int -> int)関数を適用する関数
+## (List<int>, (int -> int)) -> List<int>
+map: Callable[[List[int], Callable[[int], int]], List[int]] \
+    = lambda array, callback: [callback(e) for e in array]
+
+print(map([1, 2, 3], lambda e: e * 2))
+## -> [2, 4, 6]
+```
+
+#### パイプライン演算子の導入
+より関数型言語っぽい表現を求めるなら、パイプライン演算子も欲しい
+
+- **パイプライン演算子**:
+    - ある式の結果を別の式に1つ目の引数として渡す演算子
+        ```python
+        # (1 + 2)という式の結果をprint関数に渡す
+
+        ## 通常
+        print(1 + 2)
+
+        ## パイプライン演算子 |> を使うと以下のように書ける
+        ### ※Pythonにパイプライン演算子はないため、実際には動かない
+        1 + 2 |> print
+        ```
+    - 普通に式展開しようとすると、データは括弧の内側から展開されていく
+        - パイプライン演算子を導入すると、データが左から右からに流れるように展開される
+            ```python
+            # f1(x) => f2(x) => f3(x) のように関数を適用する場合
+
+            ## 通常
+            f3(f2(f1(x)))
+
+            ## パイプライン
+            f1(x) |> f2 |> f3
+            ```
+
+Pythonでパイプライン演算子を模倣するなら、OR演算子（`|`）などの中置演算子をオーバーロードして代替することになる
+
+```python
+from typing import Callable, Any
+
+# 中置演算子でコールバック関数を渡すためのクラス
+class pipe(object):
+    def __init__(self, any: Any) -> None:
+        # パイプラインの右側の関数に渡すための値を保持
+        self.value: Any = any
+    
+    # パイプライン演算子の代わりに OR演算子 を使う
+    ## パイプラインの右側には (Any -> Any)関数を要求
+    ## コールバック関数の戻り値を pipeオブジェクトに変換して返す（連続処理のため）
+    ## `|`関数: Any -> (Any -> Any) -> (Any -> pipe) -> pipe
+    def __or__(self, callback: Callable[[Any], Any]):
+        # pipe: Any -> pipe
+        ## (Any -> pipe) -> pipe
+        return pipe(callback(self.value))
+
+# (1 + 2) => print(x)
+pipe(1 + 2) | print
+## -> 3
+```
+
+#### パイプラインの動作イメージ
+上記の`pipe`クラスは、以下のような動作をしている
+
+- `pipe(x: Any)`:
+    - Any型の値`x`を pipe型に変換: `Any -> pipe`
+- `pipe | function`:
+    - パイプライン処理の内容を書き直すと以下のようになる
+        ```python
+        pipe | function
+        => pipe.__or__(function)
+        => __or__(pipe, function)
+        ```
