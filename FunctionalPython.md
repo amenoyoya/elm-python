@@ -459,3 +459,27 @@ def sub(last: int) -> Callable[[int], int]:
 # 上記のように定義しておけば 10 - 3 の計算も直感的に行える
 pipe(10) | sub(3) # -> 7
 ```
+
+#### マッピング関数
+関数型言語においてよくある機能として、リストやタプルなどの連続体の各要素に対して関数を適用するというものがある
+
+これを前述の部分適用関数を使って実装することが出来る
+
+マッピング関数の仕様は以下の通りである
+
+- マッピング関数: `(Any -> Any) -> (Iterable[Any] -> Iterable[Any])`
+    - 連続体の各要素に対して適用する関数（`Any -> Any`）を引数にとる
+    - 連続体を上記関数によって処理する関数（`Iterable[Any] -> Iterable[Any]`）を返す
+
+この仕様に沿って実装すると以下のようになる
+
+```python
+# Iterableコンテナ型の各要素に対して、関数を適用する関数
+## map関数: (Any -> Any) -> (Iterable[Any] -> Iterable[Any])
+def map(applier: Callable[[Any], Any]) -> Callable[[Iterable[Any]], Iterable[Any]]:
+    return lambda it: [applier(e) for e in it]
+
+# [1, 2, 3] * 2 => [2, 4, 6]
+pipe([1, 2, 3]) | map(lambda x: x * 2) | print
+## -> [2, 4, 6]
+```

@@ -44,3 +44,13 @@ def sub(n: int) -> Callable[[int], int]:
 # 10 - 3
 pipe(10) | sub(3) | print
 ## -> 7
+
+
+# Iterableコンテナ型の各要素に対して、関数を適用する関数
+## map関数: (Any -> Any) -> (Iterable[Any] -> Iterable[Any])
+def map(applier: Callable[[Any], Any]) -> Callable[[Iterable[Any]], Iterable[Any]]:
+    return lambda it: [applier(e) for e in it]
+
+# [1, 2, 3] * 2 => [2, 4, 6]
+pipe([1, 2, 3]) | map(lambda x: x * 2) | print
+## -> [2, 4, 6]
